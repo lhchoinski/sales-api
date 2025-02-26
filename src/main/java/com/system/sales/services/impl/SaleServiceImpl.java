@@ -19,11 +19,9 @@ public class SaleServiceImpl implements SaleService {
     @RabbitListener(queues = "sales.queue")
     public void processSales(SaleDTO saleRequest) {
         try {
-            processPayment(saleRequest); // Simulação de pagamento
+            processPayment(saleRequest);
 
-            // 🔹 Enviar a venda para o estoque e esperar resposta
-            List<StockExitDTO> stockResponse =
-                    (List<StockExitDTO>) rabbitTemplate.convertSendAndReceive("ecommerce.exchange", "stock.key", saleRequest);
+            StockExitDTO stockResponse = (StockExitDTO) rabbitTemplate.convertSendAndReceive("ecommerce.exchange", "stock.key", saleRequest);
 
             if (stockResponse != null) {
                 System.out.println("Venda processada com sucesso! Estoque atualizado: " + stockResponse);
